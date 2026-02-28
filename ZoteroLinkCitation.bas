@@ -17,6 +17,13 @@ End Type
 '-------------------------------------------------------------------
 
 Private p&, token, dic
+
+Private Sub DictSet(ByVal dictObj As Object, ByVal key As Variant, ByVal value As Variant)
+    If Not dictObj.Exists(key) Then
+        dictObj.Add key, value
+    End If
+End Sub
+
 Private Function ParseJSON(json$, Optional key$ = "obj") As Object
     p = 1
     token = Tokenize(json)
@@ -33,7 +40,7 @@ Private Function ParseObj(key$)
             Case "{"
                        If token(p + 1) = "}" Then
                            p = p + 1
-                           dic.Add key, "null"
+                           DictSet dic, key, "null"
                        Else
                            ParseObj key
                        End If
@@ -41,7 +48,7 @@ Private Function ParseObj(key$)
             Case "}":  key = ReducePath(key): Exit Do
             Case ":":  key = key & "." & token(p - 1)
             Case ",":  key = ReducePath(key)
-            Case Else: If token(p + 1) <> ":" Then dic.Add key, token(p)
+            Case Else: If token(p + 1) <> ":" Then DictSet dic, key, token(p)
         End Select
     Loop
 End Function
@@ -56,7 +63,7 @@ Private Function ParseArr(key$)
             Case "]":  Exit Do
             Case ":":  key = key & ArrayID(e)
             Case ",":  e = e + 1
-            Case Else: dic.Add key & ArrayID(e), token(p)
+            Case Else: DictSet dic, key & ArrayID(e), token(p)
         End Select
     Loop
 End Function
@@ -65,7 +72,7 @@ Private Function Tokenize(s$)
     #If Mac Then
         Tokenize = TokenizeVBA(s)
     #Else
-        Const Pattern = """(([^""\\]|\\.)*)""""|[+\-]?(?:0|[1-9]\d*)(?:\.\d*)?(?:[eE][+\-]?\d+)?|\w+|[^\s""']+?"
+        Const Pattern = """(([^""\\]|\\.)*)""|[+\-]?(?:0|[1-9]\d*)(?:\.\d*)?(?:[eE][+\-]?\d+)?|\w+|[^\s""']+?"
         Tokenize = RExtract(s, Pattern, True)
     #End If
 End Function
