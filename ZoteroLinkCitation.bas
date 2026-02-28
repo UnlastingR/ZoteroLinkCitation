@@ -957,6 +957,20 @@ Public Sub ZoteroLinkCitationAll()
     Exit Sub
 End Sub
 
+Public Sub ZoteroLinkCitationAllNoPrompt()
+    Dim originalRng As Range
+    Set originalRng = Selection.Range
+
+    Application.ScreenUpdating = False
+
+    Call ZoteroLinkCitation(ActiveDocument.Fields, False, False)
+
+    ActiveWindow.ScrollIntoView originalRng, True
+    originalRng.Select
+
+    Application.ScreenUpdating = True
+End Sub
+
 Private Sub ZoteroLinkCitation(targetFields, Optional debugging As Boolean = False, Optional notify As Boolean = True)
     ' Do not support Bookmark-type citations
     Dim prefs As Object
@@ -1080,10 +1094,14 @@ Private Sub ZoteroLinkCitation(targetFields, Optional debugging As Boolean = Fal
                         ' Add a bookmark to the found range
                         ActiveDocument.Bookmarks.Add Range:=rngFound, Name:=titleAnchor
                     Else
-                        If MsgBox("Not found in bibliography:" & vbCrLf & title & vbCrLf & vbCrLf & _
-                                    "Do you want to continue with the next Zotero citation?", _
-                                        vbYesNo + vbCritical, "Error") = vbNo Then
-                            GoTo ExitTheMacro
+                        If notify Then
+                            If MsgBox("Not found in bibliography:" & vbCrLf & title & vbCrLf & vbCrLf & _
+                                        "Do you want to continue with the next Zotero citation?", _
+                                            vbYesNo + vbCritical, "Error") = vbNo Then
+                                GoTo ExitTheMacro
+                            Else
+                                GoTo SkipToNextCitation
+                            End If
                         Else
                             GoTo SkipToNextCitation
                         End If

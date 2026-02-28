@@ -91,6 +91,14 @@ Press `Alt` + `F8` (Windows) or `⌥ Option` + `F8` (macOS), find and select `Zo
 3. Select the macro `ZoteroLinkCitationAll`.
 4. Click `Add` to move the macro to the list of buttons on the `Quick Access Toolbar`.
 
+#### Batch mode (no prompt)
+
+If you need a non-interactive entry for batch automation, run `ZoteroLinkCitationAllNoPrompt`.
+
+- It skips the debug confirmation dialog.
+- It skips the hyperlink text style input dialog.
+- If a citation title is not found in bibliography, it skips that citation and continues.
+
 ### (Optional) Step 6: Select an existing MS Word text style
 
 The `ZoteroLinkCitationAll` macro opens a dialog that allows you to set a uniform Word text style for newly created hyperlinks, which can change the color, size, font, etc. of the hyperlink.
