@@ -72,6 +72,8 @@ Adjust Word’s macro settings to allow the macro to run:
 
 ### Step 5: Running the `ZoteroLinkCitationAll` Macro
 
+In addition to the interactive entry `ZoteroLinkCitationAll`, the script also provides `ZoteroLinkCitationAllNoPrompt` for non-interactive/batch runs.
+
 #### Method 1: Developer Tab
 
 1. Make the `Developer` tab visible in Word (if it’s not already):
