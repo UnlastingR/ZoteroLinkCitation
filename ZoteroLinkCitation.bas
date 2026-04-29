@@ -699,7 +699,11 @@ Private Sub ExtractAuthorYearCitations(field As Field, ByRef citations() As Cita
     Next i
 
     ' Resize the array to fit the number of found ranges
-    ReDim Preserve citations(0 To rangeIndex)
+    If rangeIndex >= 0 Then
+        ReDim Preserve citations(0 To rangeIndex)
+    Else
+        ReDim citations(-1 To -1)
+    End If
 End Sub
 
 ' Such as [1], [2], [3] etc.
@@ -753,7 +757,11 @@ Private Sub ExtractNumberInBrackets(field As Field, ByRef citations() As Citatio
     Next i
 
     ' Resize the array to fit the number of found ranges
-    ReDim Preserve citations(0 To rangeIndex)
+    If rangeIndex >= 0 Then
+        ReDim Preserve citations(0 To rangeIndex)
+    Else
+        ReDim citations(-1 To -1)
+    End If
 
 End Sub
 
@@ -856,7 +864,11 @@ Private Sub ExtractSerialNumberCitations(field As Field, ByRef citations() As Ci
 
     Next i
 
-    ReDim Preserve citations(0 To rangeIndex)
+    If rangeIndex >= 0 Then
+        ReDim Preserve citations(0 To rangeIndex)
+    Else
+        ReDim citations(-1 To -1)
+    End If
 End Sub
 
 '-------------------------------------------------------------------
@@ -872,6 +884,7 @@ Private Function isSupportedStyle(ByVal style As String) As Boolean
         "china-national-standard-gb-t-7714-2015-numeric|" & _
         "china-national-standard-gb-t-7714-2015-author-date|" & _
         "harvard-cite-them-right|elsevier-harvard|modern-language-association|" & _
+        "multidisciplinary-digital-publishing-institute|" & _
         "acm-sig-proceedings|acm-sig-proceedings-long-author-list|" & _
         "the-geological-society-of-america|"
     style = "|" & style & "|"
@@ -898,6 +911,7 @@ Private Sub ExtractCitations(field As Field, ByRef citations() As Citation, styl
             Call ExtractSerialNumberCitations(field, citations, "()")
 
         Case "china-national-standard-gb-t-7714-2015-numeric", "bmc-medicine", _
+             "multidisciplinary-digital-publishing-institute", _
              "acm-sig-proceedings-long-author-list", "acm-sig-proceedings"
             Call ExtractSerialNumberCitations(field, citations, "[]")
 
