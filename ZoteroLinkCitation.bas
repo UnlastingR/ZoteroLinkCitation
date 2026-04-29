@@ -44,7 +44,7 @@ Private Function ParseObj(key$)
                        Else
                            ParseObj key
                        End If
-
+                
             Case "}":  key = ReducePath(key): Exit Do
             Case ":":  key = key & "." & token(p - 1)
             Case ",":  key = ReducePath(key)
@@ -87,11 +87,11 @@ Private Function RExtract(s$, Pattern, Optional bGroup1Bias As Boolean, Optional
     .Pattern = Pattern
     If .TEST(s) Then
       Set m = .Execute(s)
-      ReDim v(1 To m.count)
+      ReDim v(1 To m.Count)
       For Each n In m
         c = c + 1
-        v(c) = n.Value
-        If bGroup1Bias Then If Len(n.submatches(0)) Or n.Value = """""" Then v(c) = n.submatches(0)
+        v(c) = n.value
+        If bGroup1Bias Then If Len(n.submatches(0)) Or n.value = """""" Then v(c) = n.submatches(0)
       Next
     End If
   End With
@@ -226,8 +226,8 @@ End Function
 
 Function GetFilteredValues(dic, match)
     Dim c&, i&, v, w
-    v = dic.Keys
-    ReDim w(1 To dic.count)
+    v = dic.keys
+    ReDim w(1 To dic.Count)
     For i = 0 To UBound(v)
         If v(i) Like match Then
             c = c + 1
@@ -240,7 +240,7 @@ End Function
 
 Function GetFilteredTable(dic, cols)
     Dim c&, i&, j&, v, w, z
-    v = dic.Keys
+    v = dic.keys
     z = GetFilteredValues(dic, cols(0))
     ReDim w(1 To UBound(z), 1 To UBound(cols) + 1)
     For j = 1 To UBound(cols) + 1
@@ -261,20 +261,20 @@ Private Sub QuickSort(arr As Variant, inLow As Long, inHigh As Long)
     Dim tmpSwap As Variant
     Dim low As Long
     Dim high As Long
-
+    
     low = inLow
     high = inHigh
     pivot = arr((low + high) \ 2)
-
+    
     While (low <= high)
         While (arr(low) < pivot And low < inHigh)
             low = low + 1
         Wend
-
+        
         While (pivot < arr(high) And high > inLow)
             high = high - 1
         Wend
-
+        
         If (low <= high) Then
             tmpSwap = arr(low)
             arr(low) = arr(high)
@@ -283,7 +283,7 @@ Private Sub QuickSort(arr As Variant, inLow As Long, inHigh As Long)
             high = high - 1
         End If
     Wend
-
+    
     If (inLow < high) Then QuickSort arr, inLow, high
     If (low < inHigh) Then QuickSort arr, low, inHigh
 End Sub
@@ -298,7 +298,7 @@ Private Function ExtractZoteroPrefData() As String
             dict.Item(prop.Name) = prop.Value
         End If
     Next prop
-
+    
     Dim sortedKeys As Variant
     sortedKeys = dict.Keys
     Call QuickSort(sortedKeys, LBound(sortedKeys), UBound(sortedKeys))
@@ -538,7 +538,6 @@ Private Function RemoveSpecifiedHtmlTags(inputString As String, tagsToRemove As 
         Next tag
     #End If
 
-
     RemoveSpecifiedHtmlTags = inputString
 End Function
 
@@ -608,8 +607,8 @@ Private Function ParseCSLCitationJson(ByVal code As String) As Object
     Set ParseCSLCitationJson = jsonObj
 End Function
 
-Function StyleExists(ByVal styleToTest As String, ByVal docToTest As Word.Document) As Boolean
-    Dim testStyle As Word.style
+Function StyleExists(ByVal styleToTest As String, ByVal docToTest as Word.Document) As Boolean
+    Dim testStyle as Word.Style
     On Error Resume Next
     Set testStyle = docToTest.Styles(styleToTest)
     StyleExists = Not testStyle Is Nothing
@@ -620,10 +619,10 @@ End Function
 '-------------------------------------------------------------------
 
 ' Such as (Dweba et al., 2017; Hu et al., 2022; Moonjely et al., 2023)
-Private Sub ExtractAuthorYearCitations(field As field, ByRef citations() As Citation, _
+Private Sub ExtractAuthorYearCitations(field As Field, ByRef citations() As Citation, _
         Optional onlyYear As Boolean = False, Optional multiRefCommaSep As Boolean = True)
     Dim targetRange As Range, charRange As Range
-    Set targetRange = field.result
+    Set targetRange = field.Result
     Set charRange = targetRange.Duplicate
     charRange.Collapse wdCollapseStart
 
@@ -637,12 +636,12 @@ Private Sub ExtractAuthorYearCitations(field As field, ByRef citations() As Cita
     beginYear = False
 
     Dim json As Object
-    Set json = ParseCSLCitationJson(field.code)
+    Set json = ParseCSLCitationJson(field.Code)
 
     Dim startChar As Long, endChar As Long
 
     Dim i As Long
-    For i = 1 To targetRange.Characters.count
+    For i = 1 To targetRange.Characters.Count
         charRange.Start = targetRange.Start + i - 1
         charRange.End = targetRange.Start + i
 
@@ -658,7 +657,7 @@ Private Sub ExtractAuthorYearCitations(field As field, ByRef citations() As Cita
             If onlyYear And Not inCitation Then
                 inCitation = True
                 startChar = charRange.Start
-            End If
+            EndIf
 
         ' Check multiple citations of same author
         ElseIf multiRefCommaSep And charRange.Text = "," Then
@@ -672,7 +671,7 @@ Private Sub ExtractAuthorYearCitations(field As field, ByRef citations() As Cita
             beginYear = False
             If multiRefCommaSep Then nComma = 0
 
-CreateCitationObject:
+        CreateCitationObject:
             If inCitation Then
                 endChar = charRange.Start
 
@@ -700,13 +699,17 @@ CreateCitationObject:
     Next i
 
     ' Resize the array to fit the number of found ranges
-    ReDim Preserve citations(0 To rangeIndex)
+    If rangeIndex >= 0 Then
+        ReDim Preserve citations(0 To rangeIndex)
+    Else
+        ReDim citations(-1 To -1)
+    End If
 End Sub
 
 ' Such as [1], [2], [3] etc.
-Private Sub ExtractNumberInBrackets(field As field, ByRef citations() As Citation, Optional bracket As String = "[]")
+Private Sub ExtractNumberInBrackets(field As Field, ByRef citations() As Citation, Optional bracket As String = "[]")
     Dim targetRange As Range, charRange As Range
-    Set targetRange = field.result
+    Set targetRange = field.Result
     Set charRange = targetRange.Duplicate
     charRange.Collapse wdCollapseStart
 
@@ -727,7 +730,7 @@ Private Sub ExtractNumberInBrackets(field As field, ByRef citations() As Citatio
     Dim startChar As Long, endChar As Long
 
     Dim i As Long
-    For i = 1 To targetRange.Characters.count
+    For i = 1 To targetRange.Characters.Count
         charRange.Start = targetRange.Start + i - 1
         charRange.End = targetRange.Start + i
 
@@ -754,14 +757,18 @@ Private Sub ExtractNumberInBrackets(field As field, ByRef citations() As Citatio
     Next i
 
     ' Resize the array to fit the number of found ranges
-    ReDim Preserve citations(0 To rangeIndex)
+    If rangeIndex >= 0 Then
+        ReDim Preserve citations(0 To rangeIndex)
+    Else
+        ReDim citations(-1 To -1)
+    End If
 
 End Sub
 
-' Such as [47,98,100鈥?02]
-Private Sub ExtractSerialNumberCitations(field As field, ByRef citations() As Citation, Optional border = "")
+' Such as [47,98,100–102]
+Private Sub ExtractSerialNumberCitations(field As Field, ByRef citations() As Citation, Optional border = "")
     Dim targetRange As Range, charRange As Range
-    Set targetRange = field.result
+    Set targetRange = field.Result
     Set charRange = targetRange.Duplicate
     charRange.Collapse wdCollapseStart
 
@@ -781,7 +788,7 @@ Private Sub ExtractSerialNumberCitations(field As field, ByRef citations() As Ci
     lastNum = 0
 
     Dim json As Object
-    Set json = ParseCSLCitationJson(field.code)
+    Set json = ParseCSLCitationJson(field.Code)
 
     Dim startChar As Long, endChar As Long
 
@@ -789,24 +796,24 @@ Private Sub ExtractSerialNumberCitations(field As field, ByRef citations() As Ci
     Dim citationText As String
 
     Dim i As Long, RL As Long
-    RL = targetRange.Characters.count
+    RL = targetRange.Characters.Count
 
     ' Add a pseudo-border to the citation text without borders
     If Len(endBorder) = 0 Then
         RL = RL + 1
         endBorder = "]"
-    End If
+    EndIf
 
     For i = 1 To RL
         charRange.Start = targetRange.Start + i - 1
         charRange.End = targetRange.Start + i
 
-        If i <= targetRange.Characters.count Then
+        If i <= targetRange.Characters.Count Then
             currentChar = charRange.Text
         Else
             ' Point to the psuedo-border
             currentChar = endBorder
-        End If
+        EndIf
 
         If currentChar Like "[0-9]" And Not inCitation Then
             inCitation = True
@@ -841,7 +848,7 @@ Private Sub ExtractSerialNumberCitations(field As field, ByRef citations() As Ci
 
                 If Len(citations(rangeIndex).BibPattern) = 0 Then
                     Err.Raise vbObjectError + 1, "ExtractCitations", "Can not find citation CSL data"
-                End If
+                EndIf
 
                 inCitation = False
             End If
@@ -860,10 +867,8 @@ Private Sub ExtractSerialNumberCitations(field As field, ByRef citations() As Ci
     If rangeIndex >= 0 Then
         ReDim Preserve citations(0 To rangeIndex)
     Else
-        ' 没有找到任何引用，初始化为空数组
         ReDim citations(-1 To -1)
     End If
-
 End Sub
 
 '-------------------------------------------------------------------
@@ -886,7 +891,7 @@ Private Function isSupportedStyle(ByVal style As String) As Boolean
     isSupportedStyle = InStr(1, predefinedList, style, vbTextCompare) > 0
 End Function
 
-Private Sub ExtractCitations(field As field, ByRef citations() As Citation, style As String)
+Private Sub ExtractCitations(field As Field, ByRef citations() As Citation, style As String)
     Select Case style
         Case "molecular-plant", "chicago-author-date", "modern-language-association"
             Call ExtractAuthorYearCitations(field, citations, onlyYear:=False, multiRefCommaSep:=False)
@@ -923,14 +928,14 @@ End Sub
 '-------------------------------------------------------------------
 
 Public Sub ZoteroLinkCitationWithinSelection()
-    If Selection.Fields.count > 0 Then
+    If Selection.Fields.Count > 0 Then
         Dim originalRng As Range
         Set originalRng = Selection.Range
 
         Application.ScreenUpdating = False
 
         Dim targetFields As New Collection
-        Dim fld As field
+        Dim fld As Field
 
         For Each fld In Selection.Fields
             targetFields.Add fld
@@ -1004,23 +1009,23 @@ Private Sub ZoteroLinkCitation(targetFields, Optional debugging As Boolean = Fal
 
     If notify Then
         Dim resp As String
-        resp = InputBox(title:="Set an MS Word style for hyperlinks?", _
-                        prompt:="If you want to set a certain style for hyperlinks," & _
+        resp = InputBox(title := "Set an MS Word style for hyperlinks?", _
+                        prompt := "If you want to set a certain style for hyperlinks," & _
                                     " enter the name of that style below.")
         If StyleExists(resp, ActiveDocument) Then userTextStyle = resp
     End If
 
     Dim i As Long
-    Dim bibField As field
+    Dim bibField As Field
     Set bibField = Nothing
 
     ' Find the Zotero bibliography field
-    For i = ActiveDocument.Fields.count To 1 Step -1
+    For i = ActiveDocument.Fields.Count To 1 Step -1
         If ActiveDocument.Fields(i).Type = wdFieldAddin Then
-            If InStr(ActiveDocument.Fields(i).code, "ADDIN ZOTERO_BIBL") > 0 Then
+            If InStr(ActiveDocument.Fields(i).Code, "ADDIN ZOTERO_BIBL") > 0 Then
                 Set bibField = ActiveDocument.Fields(i)
                 Exit For
-            End If
+            EndIf
         End If
     Next i
 
@@ -1029,23 +1034,23 @@ Private Sub ZoteroLinkCitation(targetFields, Optional debugging As Boolean = Fal
     End If
 
     ' Iterate through all fields in the document
-    Dim aField As field, iCount As Integer
+    Dim aField As Field, iCount As Integer
     For Each aField In targetFields
         ' Check if the field is a Zotero citation
         If aField.Type = wdFieldAddin Then
-            If InStr(aField.code, "ADDIN ZOTERO_ITEM") > 0 Then
+            If InStr(aField.Code, "ADDIN ZOTERO_ITEM") > 0 Then
 
                 If debugging Then
                     ' Focus to next field
                     Application.ScreenUpdating = True
-                    ActiveWindow.ScrollIntoView aField.result, True
-                    aField.result.Select
+                    ActiveWindow.ScrollIntoView aField.Result, True
+                    aField.Result.Select
 
                     ' Update the document
                     DoEvents
 
-                    If MsgBox("Processed " & iCount & " citations, and found the next group:" & vbCrLf & vbCrLf & _
-                                aField.result.Text & vbCrLf & vbCrLf & "Do you want to continue?", _
+                    If MsgBox("Processed " & iCount & " citations, and found the next group:" & vbCrLf & vbCrLf & _ 
+                                aField.Result.Text & vbCrLf & vbCrLf & "Do you want to continue?", _
                                 vbYesNo + vbQuestion, "Continue?") = vbNo Then
                         Exit For
                     End If
@@ -1061,7 +1066,7 @@ Private Sub ZoteroLinkCitation(targetFields, Optional debugging As Boolean = Fal
                 For i = 0 To UBound(cits)
                     cit = cits(i)
                     Dim rng As Range
-                    Set rng = aField.result.Document.Range(Start:=cit.Start, End:=cit.End)
+                    Set rng = aField.Result.Document.Range(Start:=cit.Start, End:=cit.End)
                     tempBookmarkName = "ZoteroLinkCitationTempBookmark" & i
                     ActiveDocument.Bookmarks.Add Name:=tempBookmarkName, Range:=rng
                 Next i
@@ -1079,7 +1084,7 @@ Private Sub ZoteroLinkCitation(targetFields, Optional debugging As Boolean = Fal
 
                     ' Get the range of Zotero bibliography
                     Dim rngBibliography As Range
-                    Set rngBibliography = bibField.result
+                    Set rngBibliography = bibField.Result
 
                     With rngBibliography.Find
                         .ClearFormatting
@@ -1130,7 +1135,7 @@ Private Sub ZoteroLinkCitation(targetFields, Optional debugging As Boolean = Fal
 
                     iCount = iCount + 1
 
-SkipToNextCitation:
+                SkipToNextCitation:
                     ActiveDocument.Bookmarks("ZoteroLinkCitationTempBookmark" & i).Delete
 
                 Next i
@@ -1144,5 +1149,3 @@ ExitTheMacro:
     If notify Then MsgBox "Linked " & iCount & " Zotero citations.", vbInformation, "Finish"
 
 End Sub
-
-
