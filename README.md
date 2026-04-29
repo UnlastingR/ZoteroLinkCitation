@@ -150,6 +150,7 @@ This problem is nearly impossible to resolve with VBA scripts, and currently, th
 * [Nature](http://www.zotero.org/styles/nature)
 * [Vancouver](http://www.zotero.org/styles/vancouver)
 * [ACM SIG Proceedings](https://www.zotero.org/styles/acm-sig-proceedings)
+* [Multidisciplinary Digital Publishing Institute (MDPI)](http://www.zotero.org/styles/multidisciplinary-digital-publishing-institute)
 
 ### Author-only styles
 
